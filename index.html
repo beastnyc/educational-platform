@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manyfold — Learn everything you are</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2EAE0;
+    --ink: #131313;
+    --red: #E8322E;
+    --yellow: #FFD400;
+    --blue: #1E5BFA;
+    --amber: #FFB300;
+    --orange: #FF6B35;
+    --green: #00A551;
+    --purple: #B382FF;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); }
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--ink); text-decoration: none; }
+  button { font-family: 'Poppins', sans-serif; }
+  ::selection { background: var(--yellow); color: var(--ink); }
+  @keyframes mf-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ============ LEFT RAIL ============ */
+  .rail {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 248px; padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto; z-index: 50;
+  }
+  .rail-logo { display: block; margin-bottom: 8px; }
+  .rail-logo .wordmark { font-weight: 900; font-size: 34px; letter-spacing: -0.04em; line-height: 1; }
+  .rail-logo .tagline { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; margin-top: 4px; }
+  .dot { color: var(--red); }
+
+  .rail-card {
+    display: flex; flex-direction: column; gap: 56px;
+    border-radius: 16px; padding: 22px;
+    color: var(--ink); transition: transform 0.2s;
+  }
+  .rail-card:hover { transform: translateX(4px); }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .card-num { font-size: 16px; font-weight: 700; }
+  .card-arrow { font-size: 20px; font-weight: 700; }
+  .rail-card .card-label { font-size: 17px; font-weight: 700; line-height: 1.2; }
+
+  .rail-cta {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    background: var(--purple); border-radius: 16px; padding: 24px 18px;
+    font-size: 17px; font-weight: 700; line-height: 1.25;
+    transition: transform 0.2s; color: var(--ink);
+  }
+  .rail-cta:hover { transform: translateX(4px); }
+  .rail-lang {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--ink); color: var(--bg);
+    border-radius: 999px; padding: 14px 18px;
+    font-size: 14px; font-weight: 600;
+  }
+  .rail-lang .globe { font-size: 16px; }
+
+  /* ============ CONTENT ============ */
+  .content {
+    margin-left: 268px;
+    padding: 24px 24px 24px 0;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  main { display: flex; flex-direction: column; gap: 20px; }
+  main[hidden] { display: none; }
+
+  .pill-tag {
+    align-self: flex-start;
+    border: 1.5px solid var(--ink); border-radius: 999px;
+    padding: 10px 22px; font-size: 15px; font-weight: 600;
+  }
+
+  /* ---- Hero ---- */
+  .hero {
+    position: relative;
+    height: calc(100vh - 48px); min-height: 560px;
+    border-radius: 28px; overflow: hidden;
+  }
+  .hero .photo { position: absolute; inset: 0; }
+  .hero .scrim { position: absolute; inset: 0; background: rgba(19,19,19,0.35); pointer-events: none; }
+  .hero-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 24px; text-align: center; padding: 0 48px; pointer-events: none;
+  }
+  .hero h1 {
+    margin: 0; color: #FFFFFF;
+    font-size: clamp(48px, 6.5vw, 100px);
+    line-height: 1.02; font-weight: 900; letter-spacing: -0.03em;
+    max-width: 18ch;
+  }
+  .hero p {
+    margin: 0; color: #FFFFFF;
+    font-size: clamp(18px, 1.6vw, 24px); font-weight: 600;
+    max-width: 46ch; line-height: 1.4;
+  }
+  .hero-cta {
+    pointer-events: auto;
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--ink); color: var(--bg);
+    font-weight: 600; font-size: 18px;
+    padding: 18px 36px; border-radius: 999px;
+    transition: transform 0.2s;
+  }
+  .hero-cta:hover { transform: scale(1.04); }
+
+  /* Placeholder "photos" — swap for real images by giving the .photo a background-image */
+  .photo { display: block; width: 100%; height: 100%; }
+  .photo svg { display: block; width: 100%; height: 100%; }
+
+  /* ---- Ticker ---- */
+  .ticker {
+    overflow: hidden; background: var(--red); color: var(--yellow);
+    padding: 16px 0; white-space: nowrap; border-radius: 999px;
+  }
+  .ticker-track {
+    display: inline-flex; gap: 44px;
+    animation: mf-ticker 26s linear infinite;
+    padding-right: 44px;
+  }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 44px;
+    font-size: 17px; font-weight: 800; letter-spacing: 0.01em;
+  }
+  .ticker-item .sep { font-weight: 400; }
+
+  /* ---- Idea row ---- */
+  .idea-row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+  .idea-card {
+    background: var(--amber); border-radius: 28px; padding: 40px;
+    display: flex; flex-direction: column; gap: 28px;
+  }
+  .idea-card h2 {
+    margin: 0; font-size: clamp(32px, 3vw, 46px);
+    font-weight: 800; letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .idea-card p { margin: 0; font-size: 17px; line-height: 1.6; font-weight: 500; max-width: 52ch; }
+  .idea-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: auto; }
+  .btn-red {
+    background: var(--red); color: #FFFFFF;
+    font-weight: 600; font-size: 15px; padding: 12px 24px;
+    border-radius: 999px; transition: transform 0.2s;
+  }
+  .btn-red:hover { transform: scale(1.04); }
+  .idea-actions .and { font-size: 15px; font-weight: 600; }
+  .ghost-pill {
+    background: #FFFFFF; color: #9A9184;
+    font-weight: 600; font-size: 15px; padding: 12px 24px; border-radius: 999px;
+  }
+  .idea-photo { border-radius: 28px; overflow: hidden; }
+
+  /* ---- Territories ---- */
+  .territories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .terr-card {
+    display: flex; flex-direction: column;
+    border-radius: 28px; padding: 28px;
+    color: var(--ink); transition: transform 0.2s;
+  }
+  .terr-card:hover { transform: translateY(-4px); }
+  .terr-body { display: flex; flex-direction: column; gap: 4px; margin-top: 48px; }
+  .terr-card h3 { margin: 0 0 10px; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  .terr-item { font-size: 15px; font-weight: 500; padding: 9px 0; border-bottom: 1.5px solid var(--ink); }
+
+  /* ---- How it works ---- */
+  .how-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 20px; }
+  .how-card {
+    background: var(--orange); border-radius: 28px; padding: 40px;
+    display: flex; flex-direction: column; gap: 24px;
+  }
+  .how-card h2 {
+    margin: 24px 0 0; font-size: clamp(32px, 3vw, 46px);
+    font-weight: 800; letter-spacing: -0.02em; line-height: 1.08;
+  }
+  .steps { display: flex; flex-direction: column; }
+  .step {
+    display: flex; gap: 18px; align-items: baseline;
+    padding: 16px 0; border-bottom: 1.5px solid var(--ink);
+  }
+  .step .num { font-size: 15px; font-weight: 700; }
+  .step-text { display: flex; flex-direction: column; gap: 4px; }
+  .step-text .title { font-size: 18px; font-weight: 700; }
+  .step-text .body { font-size: 14.5px; font-weight: 500; line-height: 1.5; }
+
+  .how-col { display: flex; flex-direction: column; gap: 20px; }
+  .how-photo { border-radius: 28px; overflow: hidden; flex: 1; min-height: 260px; }
+  .mini-card { border-radius: 28px; padding: 32px; display: flex; flex-direction: column; }
+  .mini-card.purple { background: var(--purple); }
+  .mini-card.amber { background: var(--amber); }
+  .mini-card h3 { margin: 0 0 4px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+  .mini-card .sub { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+  .mini-card .row { font-size: 15px; font-weight: 500; padding: 10px 0; border-bottom: 1.5px solid var(--ink); }
+
+  /* ---- Footer ---- */
+  .footer {
+    background: var(--ink); color: var(--bg);
+    border-radius: 28px; padding: 64px 40px 32px;
+  }
+  .footer .wordmark {
+    font-size: clamp(56px, 9vw, 150px);
+    font-weight: 900; letter-spacing: -0.04em; line-height: 0.95;
+  }
+  .footer-meta {
+    display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    margin-top: 48px; border-top: 1px solid rgba(242,234,224,0.25); padding-top: 20px;
+    font-size: 14px; font-weight: 500; color: rgba(242,234,224,0.65);
+  }
+  .footer-meta a { color: rgba(242,234,224,0.65); }
+  .footer-links { display: flex; gap: 24px; }
+
+  /* ============ ONBOARDING ============ */
+  .onboard-panel {
+    background: var(--purple); border-radius: 28px;
+    padding: 56px 48px; min-height: calc(100vh - 48px);
+    display: flex; flex-direction: column;
+  }
+  .onboard-panel h1 {
+    margin: 32px 0 12px;
+    font-size: clamp(44px, 5.5vw, 84px);
+    font-weight: 900; letter-spacing: -0.03em; line-height: 1;
+  }
+  .onboard-panel > p {
+    margin: 0 0 40px; font-size: 18px; font-weight: 500;
+    max-width: 52ch; line-height: 1.5;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 48px; }
+  .chip {
+    cursor: pointer; font-size: 16px; font-weight: 600;
+    padding: 13px 26px; border-radius: 999px;
+    transition: all 0.15s;
+    background: transparent; color: var(--ink); border: 1.5px solid var(--ink);
+  }
+  .chip.on { background: var(--ink); color: var(--bg); }
+  .onboard-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: auto; }
+  .btn-weave {
+    font-size: 17px; font-weight: 600; padding: 16px 34px;
+    border-radius: 999px; border: none; transition: transform 0.2s;
+    cursor: pointer; background: var(--ink); color: var(--bg);
+  }
+  .btn-weave:disabled {
+    cursor: not-allowed;
+    background: rgba(19,19,19,0.15); color: rgba(19,19,19,0.45);
+  }
+  .pick-hint { font-size: 15px; font-weight: 600; }
+
+  /* ============ DASHBOARD ============ */
+  .dash-head { padding: 48px 8px 12px; }
+  .dash-head h1 {
+    margin: 28px 0 20px;
+    font-size: clamp(40px, 5vw, 76px);
+    font-weight: 900; letter-spacing: -0.03em; line-height: 1;
+  }
+  .chosen { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chosen .tag {
+    font-size: 14px; font-weight: 600; padding: 9px 18px;
+    border-radius: 999px; background: var(--ink); color: var(--bg);
+  }
+  .chosen .edit {
+    font-size: 14px; font-weight: 600; padding: 9px 18px;
+    border-radius: 999px; border: 1.5px solid var(--ink);
+  }
+  .path-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .path-card {
+    display: flex; flex-direction: column;
+    border-radius: 28px; padding: 32px;
+    color: var(--ink); transition: transform 0.2s;
+  }
+  .path-card:hover { transform: translateY(-4px); }
+  .path-body { display: flex; flex-direction: column; gap: 12px; margin-top: 40px; }
+  .combo-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .combo-tag {
+    font-size: 13px; font-weight: 600; padding: 6px 14px;
+    border-radius: 999px; border: 1.5px solid var(--ink);
+  }
+  .path-card h3 { margin: 0; font-size: 27px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+  .path-card p { margin: 0; font-size: 15px; font-weight: 500; line-height: 1.5; }
+  .path-card .cta { font-size: 15px; font-weight: 700; }
+
+  /* ============ PATH DETAIL ============ */
+  .path-hero { background: var(--amber); border-radius: 28px; padding: 48px; }
+  .path-hero .back { font-size: 15px; font-weight: 600; }
+  .path-hero .combo-tags { margin: 36px 0 20px; }
+  .path-hero h1 {
+    margin: 0 0 16px;
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 900; letter-spacing: -0.03em; line-height: 1;
+  }
+  .path-hero p { margin: 0 0 32px; font-size: 17px; font-weight: 500; line-height: 1.6; max-width: 60ch; }
+  .btn-enroll {
+    font-size: 17px; font-weight: 600; padding: 16px 34px;
+    border-radius: 999px; border: none; transition: transform 0.2s;
+    cursor: pointer; background: var(--ink); color: var(--bg);
+  }
+  .btn-enroll.enrolled { cursor: default; background: var(--green); color: #FFFFFF; }
+  .modules-panel { background: #FFFFFF; border-radius: 28px; padding: 48px; }
+  .modules { display: flex; flex-direction: column; margin-top: 32px; }
+  .module {
+    display: flex; align-items: baseline; gap: 24px;
+    padding: 20px 0; border-bottom: 1.5px solid var(--ink);
+  }
+  .module .num { font-size: 15px; font-weight: 700; min-width: 32px; }
+  .module h3 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  .module p { margin: 0; font-size: 15px; font-weight: 500; color: rgba(19,19,19,0.65); }
+  .module-text { display: flex; flex-direction: column; gap: 4px; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1100px) {
+    .territories { grid-template-columns: repeat(2, 1fr); }
+    .how-row { grid-template-columns: 1fr; }
+    .idea-row { grid-template-columns: 1fr; }
+    .idea-photo { min-height: 320px; }
+  }
+  @media (max-width: 860px) {
+    .rail {
+      position: static; width: auto;
+      flex-direction: row; flex-wrap: wrap; align-items: center;
+      padding: 20px;
+    }
+    .rail-logo { margin: 0 auto 0 0; }
+    .rail-card { gap: 8px; padding: 14px 16px; }
+    .rail-card .card-head { display: none; }
+    .rail-cta { padding: 14px 16px; }
+    .content { margin-left: 0; padding: 0 20px 20px; }
+    .hero { height: auto; min-height: 480px; }
+    .territories { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LEFT RAIL ============ -->
+<aside class="rail">
+  <a href="#" class="rail-logo" data-go="home">
+    <div class="wordmark">manyfold<span class="dot">.</span></div>
+    <div class="tagline">LEARN EVERYTHING YOU ARE</div>
+  </a>
+  <nav id="rail-cards" style="display: contents;"></nav>
+  <a href="#" class="rail-cta" data-go="onboard">Map your interests</a>
+  <div class="rail-lang">EN <span class="globe">⊕</span></div>
+</aside>
+
+<!-- ============ CONTENT ============ -->
+<div class="content">
+
+  <!-- ============ HOME ============ -->
+  <main id="screen-home">
+    <section class="hero">
+      <div class="photo" id="hero-photo"></div>
+      <div class="scrim"></div>
+      <div class="hero-inner">
+        <h1>Home of the many-minded.</h1>
+        <p>All-inclusive learning for people with too many interests — everything you need to learn, mix and make.</p>
+        <a href="#" class="hero-cta" data-go="onboard">Start your map <span>↗</span></a>
+      </div>
+    </section>
+
+    <div class="ticker">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+
+    <section class="idea-row">
+      <div class="idea-card">
+        <span class="pill-tag">The idea</span>
+        <h2>Where your curiosity just works</h2>
+        <p>Most education asks you to pick a lane. Manyfold is built for multipotentialites — people whose best work happens between fields. Tell us everything that pulls at you, and we weave it into learning paths where your range is the point, not the problem.</p>
+        <div class="idea-actions">
+          <a href="#" class="btn-red" data-go="onboard">Start now!</a>
+          <span class="and">and</span>
+          <span class="ghost-pill">no lane required</span>
+        </div>
+      </div>
+      <div class="idea-photo">
+        <div class="photo" id="idea-photo"></div>
+      </div>
+    </section>
+
+    <section class="territories" id="territories"></section>
+
+    <section class="how-row">
+      <div class="how-card">
+        <span class="pill-tag">How it works</span>
+        <h2>One brain.<br>An entire universe.</h2>
+        <div class="steps" id="steps"></div>
+      </div>
+      <div class="how-col">
+        <div class="how-photo"><div class="photo" id="community-photo"></div></div>
+        <div class="mini-card purple">
+          <h3>Community spaces</h3>
+          <span class="sub">Open access, 24/7</span>
+          <span class="row">Critique circles</span>
+          <span class="row">Cross-field studios</span>
+          <span class="row">Show &amp; tell nights</span>
+        </div>
+      </div>
+      <div class="how-col">
+        <div class="mini-card amber">
+          <h3>Your pace</h3>
+          <span class="sub">Day and night</span>
+          <span class="row">Project-based modules</span>
+          <span class="row">No fixed ladder</span>
+          <span class="row">Add interests anytime</span>
+        </div>
+        <div class="how-photo"><div class="photo" id="pace-photo"></div></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="wordmark">manyfold<span class="dot">.</span></div>
+      <div class="footer-meta">
+        <span>© 2026 Manyfold. Learn everything you are.</span>
+        <div class="footer-links">
+          <a href="#" data-go="onboard">Start</a>
+          <a href="#" data-go="dashboard">My map</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ============ ONBOARDING ============ -->
+  <main id="screen-onboard" hidden>
+    <section class="onboard-panel">
+      <span class="pill-tag">Your interests</span>
+      <h1>What pulls at you?</h1>
+      <p>Pick at least three. Don't be sensible — pick everything that's true.</p>
+      <div class="chips" id="chips"></div>
+      <div class="onboard-actions">
+        <button class="btn-weave" id="btn-weave">Weave my map ↗</button>
+        <span class="pick-hint" id="pick-hint"></span>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ DASHBOARD ============ -->
+  <main id="screen-dashboard" hidden>
+    <section class="dash-head">
+      <span class="pill-tag">Your map</span>
+      <h1>Where your interests collide.</h1>
+      <div class="chosen" id="chosen"></div>
+    </section>
+    <div class="path-grid" id="path-grid"></div>
+  </main>
+
+  <!-- ============ PATH DETAIL ============ -->
+  <main id="screen-path" hidden>
+    <section class="path-hero">
+      <a href="#" class="back" data-go="dashboard">← Back to your map</a>
+      <div class="combo-tags">
+        <span class="combo-tag" id="path-a"></span>
+        <span class="combo-tag" id="path-b"></span>
+      </div>
+      <h1 id="path-title"></h1>
+      <p id="path-blurb"></p>
+      <button class="btn-enroll" id="btn-enroll"></button>
+    </section>
+    <section class="modules-panel">
+      <span class="pill-tag">The path</span>
+      <div class="modules" id="modules"></div>
+    </section>
+  </main>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var COLORS = {
+    blue: '#1E5BFA', amber: '#FFB300', orange: '#FF6B35',
+    green: '#00A551', purple: '#B382FF'
+  };
+
+  var INTERESTS = ['Design', 'Code', 'Music', 'Writing', 'Biology', 'Film',
+    'Psychology', 'Business', 'Robotics', 'Cooking', 'Astronomy',
+    'Illustration', 'Philosophy', 'Dance', 'Architecture', 'Climate'];
+
+  var COMBOS = {
+    'Code|Design': ['Creative Tooling', 'Build interfaces, generative systems, and tools that feel like play.'],
+    'Design|Psychology': ['Human-Centered Design', 'Design that starts from how people actually think, decide, and feel.'],
+    'Code|Psychology': ['Behavioral Systems', 'Model minds in software — from habit loops to decision engines.'],
+    'Code|Music': ['Sound & Signal', 'Synthesis, live coding, and music made of algorithms.'],
+    'Design|Music': ['Visual Rhythm', 'Album art, stage visuals, and motion that moves to sound.'],
+    'Biology|Code': ['Computational Life', 'Simulate ecosystems, decode genomes, grow things in silico.'],
+    'Film|Writing': ['Screen Stories', 'From page to frame — write it, shoot it, cut it.'],
+    'Business|Design': ['Brand Craft', 'Build brands with the rigor of strategy and the taste of a studio.'],
+    'Code|Robotics': ['Machines that Move', 'Firmware, sensors, and robots that do useful (or delightful) things.'],
+    'Biology|Cooking': ['Fermentation Lab', 'Microbes, flavor chemistry, and cooking as applied science.'],
+    'Astronomy|Writing': ['Cosmic Narratives', 'Write about the universe so people actually feel its scale.'],
+    'Illustration|Writing': ['Picture & Prose', 'Graphic novels, picture books, and stories told twice at once.']
+  };
+
+  var TICKER = ['Design × Biology', 'Music × Code', 'Writing × Astronomy',
+    'Cooking × Chemistry', 'Film × Philosophy', 'Robotics × Dance',
+    'Business × Illustration', 'Climate × Architecture'];
+
+  var STEPS = [
+    { title: 'Map everything', body: 'List every interest you have — the serious ones and the ones you’re embarrassed to admit.' },
+    { title: 'We weave paths', body: 'Manyfold finds the intersections and builds project-based paths where your interests reinforce each other.' },
+    { title: 'Learn sideways', body: 'Progress isn’t a ladder here. Finish collision projects, add interests, watch your map grow denser.' }
+  ];
+
+  var TERRITORIES = [
+    { name: 'Make', color: COLORS.blue, items: ['Design', 'Code', 'Illustration', 'Architecture'] },
+    { name: 'Understand', color: COLORS.amber, items: ['Psychology', 'Biology', 'Astronomy', 'Philosophy'] },
+    { name: 'Tell', color: COLORS.orange, items: ['Writing', 'Film', 'Music', 'Dance'] },
+    { name: 'Move', color: COLORS.green, items: ['Business', 'Robotics', 'Climate', 'Cooking'] }
+  ];
+
+  var CARD_COLORS = [COLORS.blue, COLORS.amber, COLORS.orange, COLORS.green, COLORS.purple, COLORS.amber];
+
+  // ---- State (persisted) ----
+  var STORE_KEY = 'manyfold-state-v1';
+  var state = { screen: 'home', picked: ['Design', 'Code', 'Psychology'], activePath: null, enrolled: {} };
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (saved && Array.isArray(saved.picked)) {
+      state.picked = saved.picked.filter(function (p) { return INTERESTS.indexOf(p) !== -1; });
+      state.enrolled = saved.enrolled || {};
+    }
+  } catch (e) { /* fresh start */ }
+
+  function persist() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ picked: state.picked, enrolled: state.enrolled }));
+    } catch (e) { /* private mode */ }
+  }
+
+  function $(id) { return document.getElementById(id); }
+  function canWeave() { return state.picked.length >= 3; }
+  function comboKey(a, b) { return [a, b].sort().join('|'); }
+
+  function comboFor(a, b) {
+    var hit = COMBOS[comboKey(a, b)];
+    return {
+      a: a, b: b,
+      title: hit ? hit[0] : a + ' × ' + b,
+      blurb: hit ? hit[1] : 'A path woven from ' + a.toLowerCase() + ' and ' + b.toLowerCase() + ' — projects, not lectures, at the intersection.'
+    };
+  }
+
+  function pairs() {
+    var p = state.picked, out = [];
+    for (var i = 0; i < p.length; i++)
+      for (var j = i + 1; j < p.length; j++)
+        out.push([p[i], p[j]]);
+    return out.slice(0, 6);
+  }
+
+  function goTo(screen, activePath) {
+    if (screen === 'dashboard' && !canWeave()) screen = 'onboard';
+    state.screen = screen;
+    if (activePath !== undefined) state.activePath = activePath;
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  // ---- Placeholder photo art (swap for real photography later) ----
+  function photoSVG(seed) {
+    var palettes = {
+      hero: ['#1E5BFA', '#E8322E', '#FFB300', '#B382FF', '#00A551'],
+      idea: ['#FF6B35', '#1E5BFA', '#FFD400', '#B382FF'],
+      community: ['#00A551', '#FFB300', '#E8322E', '#1E5BFA'],
+      pace: ['#B382FF', '#FF6B35', '#00A551', '#FFD400']
+    };
+    var cols = palettes[seed] || palettes.hero;
+    var shapes = '';
+    for (var i = 0; i < 14; i++) {
+      var c = cols[i % cols.length];
+      var x = ((i * 137) % 100);
+      var y = ((i * 71 + 23) % 100);
+      var r = 6 + ((i * 53) % 22);
+      if (i % 3 === 0) {
+        shapes += '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + c + '" opacity="0.9"/>';
+      } else if (i % 3 === 1) {
+        shapes += '<rect x="' + x + '" y="' + y + '" width="' + (r * 1.6) + '" height="' + (r * 1.6) + '" rx="4" fill="' + c + '" opacity="0.85" transform="rotate(' + ((i * 29) % 40 - 20) + ' ' + x + ' ' + y + ')"/>';
+      } else {
+        shapes += '<path d="M ' + x + ' ' + (y + r) + ' A ' + r + ' ' + r + ' 0 0 1 ' + (x + r * 2) + ' ' + (y + r) + ' Z" fill="' + c + '" opacity="0.85"/>';
+      }
+    }
+    return '<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' +
+      '<rect width="100" height="100" fill="#131313"/>' + shapes + '</svg>';
+  }
+
+  // ---- Renderers ----
+  function renderRail() {
+    var cards = [
+      { num: '01', label: 'Home', color: COLORS.blue, screen: 'home' },
+      { num: '02', label: 'Your interests', color: COLORS.amber, screen: 'onboard' },
+      { num: '03', label: 'My map', color: COLORS.orange, screen: 'dashboard' },
+      { num: '04', label: 'Community', color: COLORS.green, screen: 'home' }
+    ];
+    $('rail-cards').innerHTML = cards.map(function (c) {
+      return '<a href="#" class="rail-card" data-go="' + c.screen + '" style="background:' + c.color + ';">' +
+        '<div class="card-head"><span class="card-num">' + c.num + '</span><span class="card-arrow">↗</span></div>' +
+        '<span class="card-label">' + c.label + '</span></a>';
+    }).join('');
+  }
+
+  function renderHome() {
+    $('ticker-track').innerHTML = TICKER.concat(TICKER).map(function (text, i) {
+      return '<span class="ticker-item">' + text + ' <span class="sep">' + (i % 2 === 0 ? '✦' : '◆') + '</span></span>';
+    }).join('');
+
+    $('territories').innerHTML = TERRITORIES.map(function (t, i) {
+      return '<a href="#" class="terr-card" data-go="onboard" style="background:' + t.color + ';">' +
+        '<div class="card-head"><span class="card-num">0' + (i + 1) + '</span><span class="card-arrow">↗</span></div>' +
+        '<div class="terr-body"><h3>' + t.name + '</h3>' +
+        t.items.map(function (it) { return '<span class="terr-item">' + it + '</span>'; }).join('') +
+        '</div></a>';
+    }).join('');
+
+    $('steps').innerHTML = STEPS.map(function (s, i) {
+      return '<div class="step"><span class="num">0' + (i + 1) + '</span>' +
+        '<div class="step-text"><span class="title">' + s.title + '</span>' +
+        '<span class="body">' + s.body + '</span></div></div>';
+    }).join('');
+
+    $('hero-photo').innerHTML = photoSVG('hero');
+    $('idea-photo').innerHTML = photoSVG('idea');
+    $('community-photo').innerHTML = photoSVG('community');
+    $('pace-photo').innerHTML = photoSVG('pace');
+  }
+
+  function renderOnboard() {
+    $('chips').innerHTML = INTERESTS.map(function (name) {
+      var on = state.picked.indexOf(name) !== -1;
+      return '<button class="chip' + (on ? ' on' : '') + '" data-chip="' + name + '">' + name + '</button>';
+    }).join('');
+    $('btn-weave').disabled = !canWeave();
+    $('pick-hint').textContent = canWeave()
+      ? state.picked.length + ' picked — nice range.'
+      : state.picked.length + ' of 3 minimum picked';
+  }
+
+  function renderDashboard() {
+    $('chosen').innerHTML = state.picked.map(function (p) {
+      return '<span class="tag">' + p + '</span>';
+    }).join('') + '<a href="#" class="edit" data-go="onboard">Edit ↗</a>';
+
+    $('path-grid').innerHTML = pairs().map(function (pair, i) {
+      var c = comboFor(pair[0], pair[1]);
+      var enrolled = !!state.enrolled[comboKey(pair[0], pair[1])];
+      return '<a href="#" class="path-card" data-path="' + pair[0] + '|' + pair[1] + '" style="background:' + CARD_COLORS[i % CARD_COLORS.length] + ';">' +
+        '<div class="card-head"><span class="card-num">0' + (i + 1) + '</span><span class="card-arrow">↗</span></div>' +
+        '<div class="path-body">' +
+        '<div class="combo-tags"><span class="combo-tag">' + c.a + '</span><span class="combo-tag">' + c.b + '</span></div>' +
+        '<h3>' + c.title + '</h3><p>' + c.blurb + '</p>' +
+        '<span class="cta">' + (enrolled ? 'Continue ↗' : 'Explore path ↗') + '</span>' +
+        '</div></a>';
+    }).join('');
+  }
+
+  function renderPath() {
+    var ap = state.activePath || ['Design', 'Code'];
+    var c = comboFor(ap[0], ap[1]);
+    var enrolled = !!state.enrolled[comboKey(ap[0], ap[1])];
+
+    $('path-a').textContent = c.a;
+    $('path-b').textContent = c.b;
+    $('path-title').textContent = c.title;
+    $('path-blurb').textContent = c.blurb + ' Five modules, all project-based, built for people fluent in more than one language of thought.';
+
+    var btn = $('btn-enroll');
+    btn.textContent = enrolled ? '✓ Enrolled — module 01 unlocked' : 'Enroll in this path ↗';
+    btn.classList.toggle('enrolled', enrolled);
+
+    var mods = [
+      { title: 'Orientation: two languages', sub: 'The core vocabulary of ' + ap[0].toLowerCase() + ' and ' + ap[1].toLowerCase() + ', side by side.' },
+      { title: 'Borrowed methods', sub: 'Steal the best working methods from each field and apply them to the other.' },
+      { title: 'First collision project', sub: 'A small, finished piece that could only exist at this intersection.' },
+      { title: 'Going deep where it counts', sub: 'Targeted depth: the 20% of each discipline this path actually needs.' },
+      { title: 'Capstone: your hybrid', sub: 'A public project that defines your version of this combination.' }
+    ];
+    $('modules').innerHTML = mods.map(function (m, i) {
+      return '<div class="module"><span class="num">0' + (i + 1) + '</span>' +
+        '<div class="module-text"><h3>' + m.title + '</h3><p>' + m.sub + '</p></div></div>';
+    }).join('');
+  }
+
+  function render() {
+    ['home', 'onboard', 'dashboard', 'path'].forEach(function (s) {
+      $('screen-' + s).hidden = (state.screen !== s);
+    });
+    if (state.screen === 'onboard') renderOnboard();
+    if (state.screen === 'dashboard') renderDashboard();
+    if (state.screen === 'path') renderPath();
+  }
+
+  // ---- Events (delegated) ----
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]');
+    if (go) { e.preventDefault(); goTo(go.getAttribute('data-go')); return; }
+
+    var chip = e.target.closest('[data-chip]');
+    if (chip) {
+      var name = chip.getAttribute('data-chip');
+      var idx = state.picked.indexOf(name);
+      if (idx === -1) state.picked.push(name); else state.picked.splice(idx, 1);
+      persist();
+      renderOnboard();
+      return;
+    }
+
+    var pathCard = e.target.closest('[data-path]');
+    if (pathCard) {
+      e.preventDefault();
+      goTo('path', pathCard.getAttribute('data-path').split('|'));
+      return;
+    }
+  });
+
+  $('btn-weave').addEventListener('click', function () { if (canWeave()) goTo('dashboard'); });
+  $('btn-enroll').addEventListener('click', function () {
+    var ap = state.activePath || ['Design', 'Code'];
+    state.enrolled[comboKey(ap[0], ap[1])] = true;
+    persist();
+    renderPath();
+  });
+
+  // ---- Boot ----
+  renderRail();
+  renderHome();
+  render();
+})();
+</script>
+</body>
+</html>
