@@ -283,6 +283,13 @@
     border-radius: 999px; border: 1.5px solid var(--ink);
   }
   .path-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .path-toggle { margin: 20px 8px 0; }
+  .paths-toggle {
+    font-size: 14px; font-weight: 500; text-transform: lowercase;
+    color: rgba(19,19,19,0.65); text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .paths-toggle:hover { color: var(--ink); }
   .path-card {
     display: flex; flex-direction: column;
     border-radius: 28px; padding: 32px;
@@ -461,6 +468,7 @@
       <div class="chosen" id="chosen"></div>
     </section>
     <div class="path-grid" id="path-grid"></div>
+    <div class="path-toggle" id="path-toggle"></div>
   </main>
 
   <!-- ============ PATH DETAIL ============ -->
@@ -532,7 +540,7 @@
 
   // ---- State (persisted) ----
   var STORE_KEY = 'manyfold-state-v1';
-  var state = { screen: 'home', picked: ['Design', 'Code', 'Psychology'], activePath: null, enrolled: {} };
+  var state = { screen: 'home', picked: ['Design', 'Code', 'Psychology'], activePath: null, enrolled: {}, showAllPairs: false };
   try {
     var saved = JSON.parse(localStorage.getItem(STORE_KEY));
     if (saved && Array.isArray(saved.picked)) {
@@ -565,7 +573,7 @@
     for (var i = 0; i < p.length; i++)
       for (var j = i + 1; j < p.length; j++)
         out.push([p[i], p[j]]);
-    return out.slice(0, 6);
+    return out;
   }
 
   function goTo(screen, activePath) {
@@ -659,7 +667,11 @@
       return '<span class="tag">' + p + '</span>';
     }).join('') + '<a href="#" class="edit" data-go="onboard">Edit ↗</a>';
 
-    $('path-grid').innerHTML = pairs().map(function (pair, i) {
+    var PREVIEW_COUNT = 6;
+    var all = pairs();
+    var visible = state.showAllPairs ? all : all.slice(0, PREVIEW_COUNT);
+
+    $('path-grid').innerHTML = visible.map(function (pair, i) {
       var c = comboFor(pair[0], pair[1]);
       var enrolled = !!state.enrolled[comboKey(pair[0], pair[1])];
       return '<a href="#" class="path-card" data-path="' + pair[0] + '|' + pair[1] + '" style="background:' + CARD_COLORS[i % CARD_COLORS.length] + ';">' +
@@ -670,6 +682,11 @@
         '<span class="cta">' + (enrolled ? 'Continue ↗' : 'Explore path ↗') + '</span>' +
         '</div></a>';
     }).join('');
+
+    $('path-toggle').innerHTML = all.length > PREVIEW_COUNT
+      ? '<a href="#" class="paths-toggle" data-toggle-paths>' +
+        (state.showAllPairs ? 'show fewer' : 'show all ' + all.length + ' paths') + '</a>'
+      : '';
   }
 
   function renderPath() {
@@ -727,6 +744,14 @@
     if (pathCard) {
       e.preventDefault();
       goTo('path', pathCard.getAttribute('data-path').split('|'));
+      return;
+    }
+
+    var toggle = e.target.closest('[data-toggle-paths]');
+    if (toggle) {
+      e.preventDefault();
+      state.showAllPairs = !state.showAllPairs;
+      renderDashboard();
       return;
     }
   });
