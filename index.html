@@ -147,6 +147,9 @@
     font-size: 17px; font-weight: 800; letter-spacing: 0.01em;
   }
   .ticker-item .sep { font-weight: 400; }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track { animation: none; }
+  }
 
   /* ---- Idea row ---- */
   .idea-row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
@@ -412,7 +415,7 @@
         <h2>One brain.<br>An entire universe.</h2>
         <div class="steps" id="steps"></div>
       </div>
-      <div class="how-col">
+      <div class="how-col" id="community-section">
         <div class="how-photo"><div class="photo" id="community-photo"></div></div>
         <div class="mini-card purple">
           <h3>Community spaces</h3>
@@ -576,11 +579,17 @@
     return out;
   }
 
-  function goTo(screen, activePath) {
+  function goTo(screen, activePath, anchorId) {
     if (screen === 'dashboard' && !canWeave()) screen = 'onboard';
     state.screen = screen;
     if (activePath !== undefined) state.activePath = activePath;
     render();
+    var anchor = anchorId && $(anchorId);
+    if (anchor) {
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      anchor.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      return;
+    }
     window.scrollTo(0, 0);
   }
 
@@ -617,10 +626,10 @@
       { num: '01', label: 'Home', color: COLORS.blue, screen: 'home' },
       { num: '02', label: 'Your interests', color: COLORS.amber, screen: 'onboard' },
       { num: '03', label: 'My map', color: COLORS.orange, screen: 'dashboard' },
-      { num: '04', label: 'Community', color: COLORS.green, screen: 'home' }
+      { num: '04', label: 'Community', color: COLORS.green, screen: 'home', anchor: 'community-section' }
     ];
     $('rail-cards').innerHTML = cards.map(function (c) {
-      return '<a href="#" class="rail-card" data-go="' + c.screen + '" style="background:' + c.color + ';">' +
+      return '<a href="#" class="rail-card" data-go="' + c.screen + '"' + (c.anchor ? ' data-anchor="' + c.anchor + '"' : '') + ' style="background:' + c.color + ';">' +
         '<div class="card-head"><span class="card-num">' + c.num + '</span><span class="card-arrow">↗</span></div>' +
         '<span class="card-label">' + c.label + '</span></a>';
     }).join('');
@@ -728,7 +737,7 @@
   // ---- Events (delegated) ----
   document.addEventListener('click', function (e) {
     var go = e.target.closest('[data-go]');
-    if (go) { e.preventDefault(); goTo(go.getAttribute('data-go')); return; }
+    if (go) { e.preventDefault(); goTo(go.getAttribute('data-go'), undefined, go.getAttribute('data-anchor')); return; }
 
     var chip = e.target.closest('[data-chip]');
     if (chip) {
