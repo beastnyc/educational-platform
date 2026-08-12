@@ -39,6 +39,11 @@
   a { color: var(--ink); text-decoration: none; }
   button { font-family: 'Poppins', sans-serif; }
   ::selection { background: var(--yellow); color: var(--ink); }
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
   @keyframes mf-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* ============ LEFT RAIL ============ */
