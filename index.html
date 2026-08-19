@@ -64,6 +64,7 @@
     color: var(--ink); transition: transform 0.2s;
   }
   .rail-card:hover { transform: translateX(4px); }
+  .rail-card:focus-visible, .rail-cta:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
   .card-head { display: flex; justify-content: space-between; align-items: flex-start; }
   .card-num { font-size: 16px; font-weight: 700; }
   .card-arrow { font-size: 20px; font-weight: 700; }
@@ -372,7 +373,7 @@
     <div class="wordmark">manyfold<span class="dot">.</span></div>
     <div class="tagline">LEARN EVERYTHING YOU ARE</div>
   </a>
-  <nav id="rail-cards" style="display: contents;"></nav>
+  <nav id="rail-cards" aria-label="Site sections" style="display: contents;"></nav>
   <a href="#" class="rail-cta" data-go="onboard">Map your interests</a>
   <div class="rail-lang">EN <span class="globe">⊕</span></div>
 </aside>
@@ -634,7 +635,8 @@
       { num: '04', label: 'Community', color: COLORS.green, screen: 'home', anchor: 'community-section' }
     ];
     $('rail-cards').innerHTML = cards.map(function (c) {
-      return '<a href="#" class="rail-card" data-go="' + c.screen + '"' + (c.anchor ? ' data-anchor="' + c.anchor + '"' : '') + ' style="background:' + c.color + ';">' +
+      var current = !c.anchor && c.screen === state.screen;
+      return '<a href="#" class="rail-card" data-go="' + c.screen + '"' + (c.anchor ? ' data-anchor="' + c.anchor + '"' : '') + (current ? ' aria-current="page"' : '') + ' style="background:' + c.color + ';">' +
         '<div class="card-head"><span class="card-num">' + c.num + '</span><span class="card-arrow">↗</span></div>' +
         '<span class="card-label">' + c.label + '</span></a>';
     }).join('');
@@ -734,6 +736,7 @@
     ['home', 'onboard', 'dashboard', 'path'].forEach(function (s) {
       $('screen-' + s).hidden = (state.screen !== s);
     });
+    renderRail();
     if (state.screen === 'onboard') renderOnboard();
     if (state.screen === 'dashboard') renderDashboard();
     if (state.screen === 'path') renderPath();
@@ -779,7 +782,6 @@
   });
 
   // ---- Boot ----
-  renderRail();
   renderHome();
   render();
 })();
